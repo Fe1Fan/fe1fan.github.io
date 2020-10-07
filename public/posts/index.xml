@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on Fe1Fan</title>
+    <link>https://fe1.fan/posts/</link>
+    <description>Recent content in Posts on Fe1Fan</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Wed, 07 Oct 2020 14:23:52 +0800</lastBuildDate><atom:link href="https://fe1.fan/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>HelloWorld</title>
+      <link>https://fe1.fan/posts/hello_world/</link>
+      <pubDate>Wed, 07 Oct 2020 14:23:52 +0800</pubDate>
+      
+      <guid>https://fe1.fan/posts/hello_world/</guid>
+      <description>H1 H2 h3 java
+demo for java // Sample javascript code var s = &amp;quot;JavaScript syntax highlighting&amp;quot;; alert(s); </description>
+    </item>
+    
+  </channel>
+</rss>

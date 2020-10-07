@@ -1,0 +1,44 @@
+baseURL = "https://fe1.fan"
+languageCode = "zh-cn"
+title = "Fe1Fan"
+theme = "cactus"
+[params]
+colortheme = "white" # dark, light, white, or classic
+description = "学习笔记"
+mainSection = "posts"
+showAllPostsOnHomePage = true
+#postsOnHomePage = 10
+showProjectsList = true
+projectsUrl = "https://github.com/monkeyWzr"
+rss = true
+#tagsOverview = true
+
+[menu]
+[[menu.main]]
+identifier = "index"
+name = "主页"
+pre = "<i class='fa fa-heart'></i>"
+url = "/"
+weight = -130
+
+[[menu.main]]
+identifier = "归档"
+name = "归档"
+pre = "<i class='fa fa-heart'></i>"
+url = "/tags/"
+weight = -120
+
+[[menu.main]]
+identifier = "about"
+name = "关于"
+pre = "<i class='fa fa-heart'></i>"
+url = "/about/"
+weight = -110
+
+[[menu.main]]
+name = "订阅"
+post = "<span class='alert'></span>"
+pre = "<i class='fa fa-road'></i>"
+url = "/index.xml"
+weight = -100
+
