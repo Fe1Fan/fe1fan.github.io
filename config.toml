@@ -7,10 +7,7 @@ colortheme = "white" # dark, light, white, or classic
 description = "学习笔记"
 mainSection = "posts"
 showAllPostsOnHomePage = true
-#postsOnHomePage = 10
-showProjectsList = false
 rss = true
-#tagsOverview = true
 
 [menu]
 [[menu.main]]
