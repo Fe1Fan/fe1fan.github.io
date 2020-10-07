@@ -8,8 +8,7 @@ description = "学习笔记"
 mainSection = "posts"
 showAllPostsOnHomePage = true
 #postsOnHomePage = 10
-showProjectsList = true
-projectsUrl = "https://github.com/monkeyWzr"
+showProjectsList = false
 rss = true
 #tagsOverview = true
 
