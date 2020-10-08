@@ -1,7 +1,7 @@
 baseURL = "https://fe1.fan"
 languageCode = "zh-cn"
 title = "Fe1Fan"
-theme = "cactus"
+theme = "papercss-hugo-theme"
 [params]
 colortheme = "white" # dark, light, white, or classic
 description = "学习笔记"
@@ -37,4 +37,22 @@ post = "<span class='alert'></span>"
 pre = "<i class='fa fa-road'></i>"
 url = "/index.xml"
 weight = -100
+
+#[menu]
+#[[menu.nav]]
+#name = "Blog"
+#url = "/"
+#weight = 1
+#[[menu.nav]]
+#name = "Tags"
+#url = "/tags/"
+#weight = 2
+#[[menu.nav]]
+#name = "About"
+#url = "/about/"
+#weight = 3
+#[[menu.nav]]
+#name = "RSS"
+#url = "/index.xml"
+#weight = 4
 

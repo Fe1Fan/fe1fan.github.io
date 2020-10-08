@@ -2,6 +2,7 @@
 title: "JVM 笔记1：内存管理"
 date: 2020-10-07T14:23:52+08:00
 draft: true
+show_summary: false
 tags: [jvm, java]
 ---
 
@@ -23,15 +24,172 @@ tags: [jvm, java]
 当这个方法调用其他方法的时候久会创建一个新的栈帧，这个新的栈帧会被放到Java虚拟机栈的栈顶，变为当前的活动栈。
 当这个栈帧所有指令都完成的时候，这个栈帧被移除，之前的栈帧变为活动栈，前面移除栈帧的返回值变为这个栈帧的一个操作数。
 
+### 栈帧
+栈帧(Stack Frame)是用于支持虚拟机进行方法调用和方法执行的数据结构,他是虚拟机栈元素。
+
+栈帧存储了以下几类数据:
+- 局部变量表
+- 操作数栈
+- 动态连接
+- 方法返回地址
+- 附加信息
+
+#### 局部变量表
+局部变量表是用于储存变量的储存空间，用于存储`方法的参数`和`方法的内部变量`
+
+#### 操作数栈
+算术运算与调用其它方法参数传递。
+
+#### 动态连接
+``每个栈帧都包含一个指向运行时常量池中该栈帧所属方法的引用``
+
+在一个class文件中，一个方法要调用其他方法，需要将这些方法的符号引用转化为其在内存地址中的直接引用，而符号引用存在于方法区中的运行时常量池。
+每个栈帧都包含一个指向运行时常量池中该栈所属方法的符号引用，持有这个引用的目的是为了支持方法调用过程中的动态连接(Dynamic Linking)。
+
+#### 方法返回地址
+当一个方法开始执行的时候有两种结束方式，正常结束和异常结束
+
+- 执行引擎遇到任意一个方法返回的字节码指令:传递给上层的方法调用者，是否有返回值和返回值类型将根据遇到何种方法来返回指令决定，这种退出的方法称为正常完成出口。
+
+- 在执行遇到异常且方法体内部没有搜寻到异常处理器的情况下。方法退出过程实际上就等同于把当前栈帧出栈，因此退出可以执行的操作有：恢复上层方法的局部变量表和操作数栈，把返回值(如果有的话)压如调用者的操作数栈中，调整PC计数器的值以指向方法调用指令后的下一条指令。
+
+#### 附加信息
+虚拟机规范允许具体的虚拟机实现增加一些规范中没有描述的信息到栈帧之中，例如和调试相关的信息，这部分信息完全取决于不同的虚拟机实现。在实际开发中，一般会把动态连接，方法返回地址与其他附加信息一起归为一类，称为栈帧信息。
+
+## 本地方法栈（Native Method Stacks）
+
+Native方法栈，HotSpot虚拟机把本地方法栈和虚拟机栈合二为一
+
+## Java堆（Java Heap）
+
+概念：用于存放对象实例，Java世界里“几乎”所有的对象实例都在这里分配内存。
+
+### HotSpot：
+![HotSpot](https://i.loli.net/2020/10/08/lxTiXe2rzF83PWo.png)
+- Old 老年代
+- Eden 新生代
+- Survivor 0 临时交换区0
+- Survivor 1 临时交换区1
+- Metaspace 元数据区域
+
+#### Old 老年代
+存放逃过N次（默认为15次）GC回收的对象
+
+#### Eden 新生代
+存放新创建的对象
+
+#### Survivor
+临时存放年轻代没有被回收的对象
+
+#### Metaspace
+概念：与堆不相连的本地内存
+
+
+## 方法区（Method Area）
+用于存储已被虚拟机加载的类型信息、常量、静态变量、即时编译器编译后的代码缓存等数据。
+
+## 运行时常量池（Runtime Constant Pool）
+运行时常量池（Runtime Constant Pool）是方法区的一部分。
+
+Class文件中除了有类的版本、字段、方法、接口等描述信息外，还有一项信息是常量池表（Constant Pool Table），用于存放编译期生成的各种字面量与符号引用，这部分内容将在类加载后存放到方法区的运行时常量池中。
+
+## 直接内存（Direct Memory）
+
+在JDK 1.4中新加入了NIO（New Input/Output）类，引入了一种基于通道（Channel）与缓冲区（Buffer）的I/O方式，它可以使用Native函数库直接分配堆外内存，然后通过一个存储在Java堆里面的DirectByteBuffer对象作为这块内存的引用进行操作。这样能在一些场景中显著提高性能，因为避免了在Java堆和Native堆中来回复制数据。
 
 
 
-## 本地方法栈
 
-## Java堆
 
-## 方法区
+### DEMO
+HelloWorld.java :
+```
+public class HelloWorld {
+    static void add(int a, int b) {
+        int c = a + b;
+    }
 
-## 运行时常量池
+    public static void main(String[] args) {
+        int a = 0;
+        int b = 1;
+        add(a, b);
+    }
+}
 
-## 直接内存
+```
+
+HelloWorld.class ：
+```
+public class sample.HelloWorld
+  minor version: 0
+  major version: 55
+  flags: (0x0021) ACC_PUBLIC, ACC_SUPER
+  this_class: #3                          // sample/HelloWorld
+  super_class: #4                         // java/lang/Object
+  interfaces: 0, fields: 0, methods: 3, attributes: 1
+Constant pool:
+   #1 = Methodref          #4.#15         // java/lang/Object."<init>":()V
+   #2 = Methodref          #3.#16         // sample/HelloWorld.add:(II)V
+   #3 = Class              #17            // sample/HelloWorld
+   #4 = Class              #18            // java/lang/Object
+   #5 = Utf8               <init>
+   #6 = Utf8               ()V
+   #7 = Utf8               Code
+   #8 = Utf8               LineNumberTable
+   #9 = Utf8               add
+  #10 = Utf8               (II)V
+  #11 = Utf8               main
+  #12 = Utf8               ([Ljava/lang/String;)V
+  #13 = Utf8               SourceFile
+  #14 = Utf8               HelloWorld.java
+  #15 = NameAndType        #5:#6          // "<init>":()V
+  #16 = NameAndType        #9:#10         // add:(II)V
+  #17 = Utf8               sample/HelloWorld
+  #18 = Utf8               java/lang/Object
+{
+  public sample.HelloWorld();
+    descriptor: ()V
+    flags: (0x0001) ACC_PUBLIC
+    Code:
+      stack=1, locals=1, args_size=1
+         0: aload_0
+         1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+         4: return
+      LineNumberTable:
+        line 4: 0
+
+  static void add(int, int);
+    descriptor: (II)V
+    flags: (0x0008) ACC_STATIC
+    Code:
+      stack=2, locals=3, args_size=2
+         0: iload_0
+         1: iload_1
+         2: iadd
+         3: istore_2
+         4: return
+      LineNumberTable:
+        line 6: 0
+        line 7: 4
+
+  public static void main(java.lang.String[]);
+    descriptor: ([Ljava/lang/String;)V
+    flags: (0x0009) ACC_PUBLIC, ACC_STATIC
+    Code:
+      stack=2, locals=3, args_size=1
+         0: iconst_0
+         1: istore_1
+         2: iconst_1
+         3: istore_2
+         4: iload_1
+         5: iload_2
+         6: invokestatic  #2                  // Method add:(II)V
+         9: return
+      LineNumberTable:
+        line 10: 0
+        line 11: 2
+        line 12: 4
+        line 13: 9
+}
+
+```
