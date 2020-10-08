@@ -1,7 +1,6 @@
 ---
 title: "JVM 笔记1：内存管理"
 date: 2020-10-07T14:23:52+08:00
-draft: true
 show_summary: false
 tags: [jvm, java]
 ---
@@ -82,7 +81,8 @@ Native方法栈，HotSpot虚拟机把本地方法栈和虚拟机栈合二为一
 临时存放年轻代没有被回收的对象
 
 #### Metaspace
-概念：与堆不相连的本地内存
+与堆不相连的本地内存
+Java8 以后替代永久带存放Class元数据
 
 
 ## 方法区（Method Area）
@@ -193,3 +193,9 @@ Constant pool:
 }
 
 ```
+
+
+参考：
+- https://www.oracle.com/technetwork/cn/java/javase/tech/index.html
+- https://www.oracle.com/java/technologies/javase/javase-core-technologies-apis.html
+- https://stuefe.de/posts/metaspace/what-is-metaspace/
