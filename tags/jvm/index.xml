@@ -14,4 +14,4 @@ Java虚拟机栈 (Java Virtual Machine Stack) 与程序计数器一样，Java虚
 附加信息 虚拟机规范允许具体的虚拟机实现增加一些规范中没有描述的信息到栈帧之中，例如和调试相关的信息，这部分信息完全取决于不同的虚拟机实现。在实际开发中，一般会把动态连接，方法返回地址与其他附加信息一起归为一类，称为栈帧信息。
 本地方法栈（Native Method Stacks） Native方法栈，HotSpot虚拟机把本地方法栈和虚拟机栈合二为一
 Java堆（Java Heap） 概念：用于存放对象实例，Java世界里“几乎”所有的对象实例都在这里分配内存。
-HotSpot： Old 老年代 Eden 新生代 Survivor 0 临时交换区0 Survivor 1 临时交换区1 Metaspace 元数据区域 Old 老年代 存放逃过N次（默认为15次）GC回收的对象</description></item></channel></rss>
+HotSpot： Old 老年代 Eden 新生代 Survivor0 临时交换区0 Survivor1 临时交换区1 Metaspace 元数据区域 Old 老年代 存放逃过N次（默认为15次）GC回收的对象</description></item></channel></rss>
