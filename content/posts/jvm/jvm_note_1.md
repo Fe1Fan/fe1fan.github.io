@@ -1,7 +1,6 @@
 ---
 title: "JVM 笔记1：内存管理"
 date: 2020-10-07T14:23:52+08:00
-show_summary: false
 tags: [jvm, java]
 ---
 
@@ -67,8 +66,8 @@ Native方法栈，HotSpot虚拟机把本地方法栈和虚拟机栈合二为一
 ![HotSpot](https://i.loli.net/2020/10/08/lxTiXe2rzF83PWo.png)
 - Old 老年代
 - Eden 新生代
-- Survivor 0 临时交换区0
-- Survivor 1 临时交换区1
+- Survivor0 临时交换区0
+- Survivor1 临时交换区1
 - Metaspace 元数据区域
 
 #### Old 老年代
