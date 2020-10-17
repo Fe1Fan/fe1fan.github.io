@@ -95,6 +95,7 @@ Java8 以后替代永久带存放Class元数据
 运行时常量池（Runtime Constant Pool）是方法区的一部分。
 
 Class文件中除了有类的版本、字段、方法、接口等描述信息外，还有一项信息是常量池表（Constant Pool Table），用于存放编译期生成的各种字面量与符号引用，这部分内容将在类加载后存放到方法区的运行时常量池中。
+jdk1.8之后由Metaspace取代
 
 ## 直接内存（Direct Memory）
 
