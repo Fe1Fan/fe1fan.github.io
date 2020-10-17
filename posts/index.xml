@@ -14,4 +14,23 @@ Java虚拟机栈 (Java Virtual Machine Stack) 与程序计数器一样，Java虚
 附加信息 虚拟机规范允许具体的虚拟机实现增加一些规范中没有描述的信息到栈帧之中，例如和调试相关的信息，这部分信息完全取决于不同的虚拟机实现。在实际开发中，一般会把动态连接，方法返回地址与其他附加信息一起归为一类，称为栈帧信息。
 本地方法栈（Native Method Stacks） Native方法栈，HotSpot虚拟机把本地方法栈和虚拟机栈合二为一
 Java堆（Java Heap） 概念：用于存放对象实例，Java世界里“几乎”所有的对象实例都在这里分配内存。
-HotSpot： Old 老年代 Eden 新生代 Survivor0 临时交换区0 Survivor1 临时交换区1 Metaspace 元数据区域 Old 老年代 存放逃过N次（默认为15次）GC回收的对象</description></item></channel></rss>
+HotSpot： Old 老年代 Eden 新生代 Survivor0 临时交换区0 Survivor1 临时交换区1 Metaspace 元数据区域 Old 老年代 存放逃过N次（默认为15次）GC回收的对象、需要大量连续内存的新生对象。</description></item><item><title>JVM 笔记2：垃圾回收</title><link>https://fe1.fan/posts/jvm/jvm_note_2/</link><pubDate>Wed, 07 Oct 2020 14:23:52 +0800</pubDate><guid>https://fe1.fan/posts/jvm/jvm_note_2/</guid><description>JVM 垃圾回收 什么是垃圾 哪里需要垃圾回收 什么时候回收 怎么回收 什么是垃圾 当对象不再被需要的时候，就是需要被回收的垃圾。
+哪里需要垃圾回收 Java堆
+方法区
+什么时候回收 1.年轻代
+当Eden区没有足够空间进行分配时，虚拟机将发起一次Minor GC，也就是新生代的GC。
+2.老年代
+在发生Minor GC之前，虚拟机必须先检查老年代最大可用的连续空间是否大于新生代所有对象总空间，如果这个条件成立，那这一次Minor GC可以确保是安全的。如果不成立，则虚拟机会先查看-XX：HandlePromotionFailure参数的设置值是否允许担保失败（Handle Promotion Failure）；如果允许，那会继续检查老年代最大可用的连续空间是否大于历次晋升到老年代对象的平均大小，如果大于，将尝试进行一次Minor GC，尽管这次Minor GC是有风险的；如果小于，或者-XX：HandlePromotionFailure设置不允许冒险，那这时就要改为进行一次Full GC。
+方法区 方法区主要回收两部分 废弃的常量 不再被使用的类型 常量：
+当方法区的常量不再被任何一个对象引用时
+不再被使用的类型：
+该类所有的实例都已经被回收，也就是Java堆中不存在该类及其任何派生子类的实例。
+加载该类的类加载器已经被回收。
+该类对应的java.lang.Class对象没有在任何地方被引用，无法在任何地方通过反射访问该类的方法。
+垃圾回收的步骤 1.收集
+2.清理
+1.引用计数法（Reference Counting） JVM 并没有采用大多数人所说的引用计数法，是从来没有。
+概念 在对象中添加一个引用计数器，每当有一个地方引用它时，计数器值就加一；当引用失效时，计数器值就减一；任何时刻计数器为零的对象就是不可能再被使用的。
+优点 原理简单，判定效率也很高
+缺陷 占用了一些额外的内存空间来进行计数
+class Demo { public Object object = null; public static void main(String[] args){ Demo demoA = new Demo(); Demo demoB = new Demo(); demoA.</description></item></channel></rss>
