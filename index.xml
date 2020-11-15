@@ -32,4 +32,4 @@ HotSpot： Old 老年代 Eden 新生代 Survivor0 临时交换区0 Survivor1 临
 该类对应的java.lang.Class对象没有在任何地方被引用，无法在任何地方通过反射访问该类的方法。
 怎么回收 几种垃圾回收算法 分代收集 标记清除 标记复制 标记整理 分代收集 弱分代假说：绝大多数对象都是朝生夕灭的。
 强分代假说：熬过越多次垃圾收集过程的对象就越难以消亡。
-跨代引用假说：跨代引用相对于同代引用来说仅占极少数。</description></item></channel></rss>
+跨代引用假说：跨代引用相对于同代引用来说仅占极少数。</description></item><item><title>TCP/IP 笔记1</title><link>https://fe1.fan/posts/tcp_ip/tcp_ip_1/</link><pubDate>Wed, 07 Oct 2020 14:23:52 +0800</pubDate><guid>https://fe1.fan/posts/tcp_ip/tcp_ip_1/</guid><description>TODO</description></item></channel></rss>
