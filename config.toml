@@ -9,6 +9,9 @@ mainSection = "posts"
 showAllPostsOnHomePage = true
 rss = true
 
+[markup.highlight]
+codeFences = false
+
 [menu]
 [[menu.main]]
 identifier = "index"
