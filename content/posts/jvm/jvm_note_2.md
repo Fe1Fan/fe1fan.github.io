@@ -207,7 +207,7 @@ OopMap存放在特定位置，这个位置被称为安全点，当代码执行�
 ![QQ20201017-204240.png](https://i.loli.net/2020/10/17/BqwHbhIz4g13fML.png)
 
 #### Garbage First(G1) 收集器
-- 程碑式
+- 里程碑式
 - 面向堆内存任何部分来组成回收集
 - Region的堆内存布局
   
