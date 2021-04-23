@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Fe1Fan</title><link>https://fe1.fan/</link><description>Recent content on Fe1Fan</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Wed, 07 Oct 2020 14:23:52 +0800</lastBuildDate><atom:link href="https://fe1.fan/index.xml" rel="self" type="application/rss+xml"/><item><title>About</title><link>https://fe1.fan/about/</link><pubDate>Wed, 07 Oct 2020 14:35:26 +0800</pubDate><guid>https://fe1.fan/about/</guid><description>About Fe1Fan: Make Bug Great Again
 Blog: https://fe1.fan
-GitHub: https://github.com/Fe1Fan</description></item><item><title>JVM 笔记1：内存管理</title><link>https://fe1.fan/posts/jvm/jvm_note_1/</link><pubDate>Wed, 07 Oct 2020 14:23:52 +0800</pubDate><guid>https://fe1.fan/posts/jvm/jvm_note_1/</guid><description>JVM-1 内存管理 程序计数器 (Program Counter Register) 程序计数器（Program Counter Register）是一块较小的内存空间，它可以看作是当前线程所执行的字节码的行号指示器。在Java虚拟机的概念模型里，字节码解释器工作时就是通过改变这个计数器的值来选取下一条需要执行的字节码指令，它是程序控制流的指示器，分支、循环、跳转、异常处理、线程恢复等基础功能都需要依赖这个计数器来完成。
+GitHub: https://github.com/Fe1Fan</description></item><item><title>Java基础知识1-容器</title><link>https://fe1.fan/posts/java/java_basics_1/</link><pubDate>Wed, 07 Oct 2020 14:23:52 +0800</pubDate><guid>https://fe1.fan/posts/java/java_basics_1/</guid><description>在Java中，容器主要分为一下两类
+Collection Map Collection 主要实现关系如下：
+Collection Interface Set Interface
+SortedSet Interface TreeSet Class HashSet Class LinkedHashSet Class List Interface
+ArrayList Class Vector Class LinkedList Class Queue Interface
+LinkedList Class PriorityQueue Class Set TreeSet 基于红黑树，支持有序的操作，例如根据范围查找，但是效率不如HashSet。
+HashSet 基于哈希表实现，支持快速查找，失去了元素的插入顺序信息。
+LinkedHashSet 具有 HashSet 的查找效率，并且内部使用双向链表维护元素的插入顺序。
+List ArrayList</description></item><item><title>JVM 笔记1：内存管理</title><link>https://fe1.fan/posts/jvm/jvm_note_1/</link><pubDate>Wed, 07 Oct 2020 14:23:52 +0800</pubDate><guid>https://fe1.fan/posts/jvm/jvm_note_1/</guid><description>JVM-1 内存管理 程序计数器 (Program Counter Register) 程序计数器（Program Counter Register）是一块较小的内存空间，它可以看作是当前线程所执行的字节码的行号指示器。在Java虚拟机的概念模型里，字节码解释器工作时就是通过改变这个计数器的值来选取下一条需要执行的字节码指令，它是程序控制流的指示器，分支、循环、跳转、异常处理、线程恢复等基础功能都需要依赖这个计数器来完成。
 简单来说就是记录程序执行到第几行了，每条线程有单独的程序计数器。
 Java虚拟机栈 (Java Virtual Machine Stack) 与程序计数器一样，Java虚拟机栈（Java Virtual Machine Stack）也是线程私有的，它的生命周期与线程相同。虚拟机栈描述的是Java方法执行的线程内存模型：每个方法被执行的时候，Java虚拟机都会同步创建一个栈帧（Stack Frame）用于存储局部变量表、操作数栈、动态连接、方法出口等信息。每一个方法被调用直至执行完毕的过程，就对应着一个栈帧在虚拟机栈中从入栈到出栈的过程。
 栈与栈帧 每一个方法的执行到执行完成，对应着一个栈帧在虚拟机中从入栈到出栈的过程。 虚拟机栈栈顶的栈帧就是当前执行方法的栈帧。 当这个方法调用其他方法的时候久会创建一个新的栈帧，这个新的栈帧会被放到Java虚拟机栈的栈顶，变为当前的活动栈。 当这个栈帧所有指令都完成的时候，这个栈帧被移除，之前的栈帧变为活动栈，前面移除栈帧的返回值变为这个栈帧的一个操作数。
