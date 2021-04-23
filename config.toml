@@ -1,7 +1,7 @@
 baseURL = "https://fe1.fan"
 languageCode = "zh-cn"
 title = "Fe1Fan"
-theme = "cactus"
+theme = "minos"
 [params]
 colortheme = "white" # dark, light, white, or classic
 description = "学习笔记"

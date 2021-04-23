@@ -4,6 +4,8 @@ date: 2020-10-07T14:23:52+08:00
 tags: [java基础]
 ---
 
+---
+<!--more-->
 在Java中，容器主要分为一下两类
 - Collection
 - Map
