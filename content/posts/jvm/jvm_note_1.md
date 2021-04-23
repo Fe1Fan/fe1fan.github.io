@@ -1,7 +1,7 @@
 ---
 title: "JVM 笔记1：内存管理"
 date: 2020-10-07T14:23:52+08:00
-tags: [jvm, java]
+tags: [jvm]
 ---
 <!--more--> 
 # JVM-1 内存管理
