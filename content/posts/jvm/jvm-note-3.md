@@ -1,8 +1,8 @@
 ---
-title: "JVM 笔记3：虚拟机执行系统"
+title: "JVM 笔记3：Class文件结构"
 date: 2020-10-07T14:23:52+08:00
-draft: true
 tags: [jvm]
+draft: true
 ---
 
 <!--more--> 
@@ -28,12 +28,14 @@ public class Main {
 }
 ```
 
+将Main.java编译成class文件（具体编译过程-[编译原理](https://fe1.fan//tags/compilation-principle/)）
+
 ---
 
 ### 1.2 魔数（Magic Number）
 > 每个Class文件的头4个字节被称为魔数
 
-魔数的作用是确定这个文件能否被虚拟机接受。Java的魔数为`0xCAFEBABE`，紧接着魔数的4个字节(0-3)为Class的版本号 4、5为次版本号（Minor Version），6、7为主版本号（Major Version）
+魔数的作用是确定这个文件能否被虚拟机接受。Java的魔数为`0xCAFEBABE`，紧接着魔数(0-3)的4个字节(4-7)为Class的版本号 4、5为次版本号（Minor Version），6、7为主版本号（Major Version）
 
 
 以Main.java为例
@@ -53,7 +55,7 @@ public class Main {
 ![image.png](https://i.loli.net/2021/04/26/IunVUWPafH7k8sD.png)
 
 其中 第8、9位为u2类型的数据，常量池的长度， 即常量池容量计数值（constant_pool_count），是在编译时期确定下来的。
-常量池计数从1开始，上图 `0x001D` 为十进制的29，这就代表常量池中有28个常量。
+**常量池计数从1开始**，上图 `0x001D` 为十进制的29，这就代表常量池中有28个常量。
 
 常量池中主要存放两大类常量：字面量（Literal）和符号引用（Symbolic References）。
 
@@ -64,9 +66,10 @@ public class Main {
 - 方法句柄和方法类型
 - 动态调用点和动态常量
 
-Class文件中不会保存各个方法、字段最终在内存中的布局信息，在类加载的时候JVM负责把常量布局到真正的内存。
+不同于C/C++，JVM是在加载类的时候进行动态链接的，也就是说这些字段和方法符号在运行时转换后才能获取到真正的内存地址。
   
 常量池中每一项常量都是一个表，以下为所有的表结构数据。
 
 ![Image00116.jpg](https://i.loli.net/2021/04/26/KrUzpTyqWu7NfSG.jpg)
 ![Image00117.jpg](https://i.loli.net/2021/04/26/nFPXpekoWKJI52f.jpg)
+

@@ -21,7 +21,25 @@ draft: true
 
 [comment]: <> (- 其他)
 
-### innoDB 索引：B+树
+## 索引类型
+以InnoDB为例，索引类型分为四种
+- FULLTEXT
+- NORMAL
+- SPATIAL
+- UNIQUE
+
+### 全文索引 (FULLTEXT)
+### 普通索引 (NORMAL)
+### 空间索引 (SPATIAL)
+### 唯一索引 (UNIQUE)
+
+
+## 索引方法
+以InnoDB为例，索引方法分为两种
+- B+树
+- HASH
+
+### B+树
 此数不再赘述数据结构，如需了解查看：[数据结构与算法](https://fe1.fan/posts/data_structures_algorithms/data_structures_algorithms_1.md)
 
 在InnoDB中，每个索引对应一棵B+树。
@@ -76,8 +94,9 @@ graph LR
 
 当查询语句索引走的是非主键索引时，搜索到内容后再根据主键内容到主键树搜索一次，这个过程被称为回表。
 
+### HASH
 
-### 索引优化
+## 索引优化
 
 当根据k查询时:
 ```sql
