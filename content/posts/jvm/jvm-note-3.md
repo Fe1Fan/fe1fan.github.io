@@ -254,6 +254,8 @@ Constant pool:
 ![2.jpg](https://i.loli.net/2021/05/16/9LCHXig5UjdTGQz.jpg)
 ![3.jpg](https://i.loli.net/2021/05/16/dFDS2ajvWkwpnNJ.jpg)
 
+---
+
 ### 1.4 访问标志
 入下图所示：
 
@@ -266,6 +268,8 @@ Constant pool:
 ![Image00124.jpg](https://i.loli.net/2021/05/16/pBcv2N1gas6SUmC.jpg)
 
 本类的 `access_flags` 为 0x0001 | 0x0020 = 0x0021(ACC_PUBLIC, ACC_SUPER)
+
+---
 
 ### 1.5 类索引、父类索引与接口索引集合
 
@@ -285,6 +289,8 @@ Class文件由这三项数据来确定该类型的继承关系，类索引用于
   super_class: #6                         // java/lang/Object
   interfaces: 0, fields: 0, methods: 2, attributes: 1
 ```
+
+---
 
 ### 1.6 字段表集合
 
@@ -477,6 +483,8 @@ attributes_count 为 0x0000，代表属性表计数器为0。
 
 如果我们将字段改成final，那就可能存在一项为 ConstantValue 的属性，其值指向常量 HelloWorld。
 
+---
+
 ### 1.7 方法表集合
 > Class文件存储格式中对方法的描述
 
@@ -512,6 +520,8 @@ attributes_count 为 0x0000，代表属性表计数器为0。
 
 在Java中，要重载一个方法除了要求具有相同的简单名称之外，还要求必须拥有一个与原方法不同的特征签名。特征签名是指
 一个方法中各个参数在常量池重的字段符号引用的集合。也正是因为返回值不会包含在特征签名之中，所以Java语言里面是无法仅仅依靠返回值的不同来对一个已有方法进行重载的。但是在Class文件格式之中，特征签名的范围明显要更大一些，只要描述符不是完全一致的两个方法就可以共存。也就是说，如果两个方法有相同的名称和特征签名，但返回值不同，那么也是可以合法共存于同一个Class文件中的。
+
+---
 
 ### 1.8 属性表集合
 > Class文件、字段表、方法表都可以携带自己的属性表集合，以描述某些场景专有的信息。
