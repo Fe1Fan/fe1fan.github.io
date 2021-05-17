@@ -27,7 +27,7 @@ public class Main {
 }
 ```
 
-将Main.java编译成class文件（具体编译过程-[编译原理](https://fe1.fan//tags/compilation-principle/)）
+将Main.java编译成class文件（具体编译过程-[编译原理](https://fe1.fan/tags/compilation-principle/)）
 
 ---
 
