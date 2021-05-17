@@ -28,9 +28,6 @@ jobs:
       - name: Build
         run: hugo --minify
 
-      - name: Echo
-        run: echo `ls` && echo `pwd`
-
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
