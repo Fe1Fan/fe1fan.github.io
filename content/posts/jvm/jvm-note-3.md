@@ -37,7 +37,7 @@ public class Main {
 魔数的作用是确定这个文件能否被虚拟机接受。Java的魔数为`0xCAFEBABE`，紧接着魔数(0x00000000-0x00000003)的4个字节(0x00000004-0x00000007)为Class的版本号 4、5为次版本号（Minor Version），6、7为主版本号（Major Version）
 
 
-以Main.java为例
+以Main.class为例
 ![image.png](https://i.loli.net/2021/04/25/qcwVNkyDsmU3auS.png)
 
 可以看到，魔数为 `0xCAFEBABE`，紧跟着次版本号为 `0x0000`，主版本号为 `0x0037`，十进制的55，即为JDK11。
