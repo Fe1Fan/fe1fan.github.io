@@ -1078,3 +1078,82 @@ Exceptions结构如下：
 |u1 | attribute_length|1|
 |u2 | number_of_exceptions|1|
 |u2 | exception_index_table|number_of_exceptions|
+
+number_of_exceptions 表示方法可能排除 number_of_exceptions种受查询异常。
+
+每一个异常检查使用一个exception_index_table项表示，exception_index_table 指向常量池的 `CONSTANT_Class_info` 类型索引，代表的该受查异常的类型。
+
+### 1.8.3 LineNumberTable
+> 描述Java源码行号与字节码行号（字节码的偏移量）之间的对应关系。
+
+非必须，可在编译时期使用 `javac -g: none` 或者 `javac -g: lines` 来取消或者生成这项信息，如果不生成，抛出异常时堆栈中则不会显示出错误行号，并且在调试程序的时候，也无法按照源码行来设置断点。
+
+LineNumberTable 结构如下：
+
+| 类型 | 名称 | 数量 |
+| ---- | ---- | ---- |
+|u2 | attribute_name_index|1|
+|u4 | attribute_length|1|
+|u2 | line_number_table_length|1|
+|line_number_info | line_number_table|line_number_table_length|
+
+line_number_table 是一个数量为 line_number_table_length 类型为 line_number_info 的集合。
+
+line_number_info 结构如下:
+
+| 类型 | 名称 | 数量 |
+| ---- | ---- | ---- |
+|u2 | start_pc|1|
+|u2 | line_number|1|
+
+start_pc 为字节码行号。
+line_number 为源码行号。
+
+### 1.8.4 LocalVariableTable && LocalVariableTypeTable
+
+> LocalVariableTable 用于描述栈帧中局部变量表的变量与Java源码中定义的变量之间的关系
+
+> LocalVariableTypeTable 与 LocalVariableTable 类似
+
+LocalVariableTable 非必需，可在编译时期使用 `javac -g: none` 或者 `javac -g: vars` 来取消或者要求生成，如果不生成，其他人引用这个方法时所有的参数名称将会丢失。
+
+LocalVariableTable 结构如下：
+
+| 类型 | 名称 | 数量 |
+| ---- | ---- | ---- |
+|u2 | attribute_name_index|1|
+|u4 | attribute_length|1|
+|u2 | local_variable_table_line|1|
+|local_variable_info | local_variable_table|local_variable_table_line|
+
+local_variable_info 代表了一个栈帧与源码中局部变量的关联，结构如下：
+
+| 类型 | 名称 | 数量 |
+| ---- | ---- | ---- |
+|u2 | start_pc|1|
+|u2 | length|1|
+|u2 | name_index|1|
+|u2 | descriptor_index|1|
+|u2 | index|1|
+
+start_pc 和 length 属性分别代表了这个局部变量的声明周期开始与字节码编译及其作用范围的覆盖长度，两者结合起来就是这个局部变量在字节码之中的作用范围。
+
+name_index 和 descriptor_index 都是指向常量池中CONSTANT_Utf8_info型常量的索引，分别代表了局部变量的名称以及这个局部变量的描述符。
+
+index 是这个局部变量在栈帧的局部变量表中变量槽的位置。当这个变量数据类型是64位类型时（double和long），它占用的变量槽为index和index+1两个。
+
+LocalVariableTypeTable 与 LocalVariableTable 类似，LocalVariableTypeTable结构中的 descriptor_index 替换成了字段的特征签名。（//TODO）
+
+### 1.8.5 SourceFile && SourceDebugExtension
+
+> 用于记录生成这个Class文件的源码文件名称。
+
+非必需，使用 `javac -g: none` 或者 `javac -g: source` 来确认生成还是不生成，如不生成，在内部类的情况下，抛出异常时堆栈中将不显示错误代码所属的文件名。
+
+属性如下：
+//TODO
+
+## 1.9 字节码指令
+以上就是类的全部结构，本章节将讲述类的字节码指令。
+//TODO
+
