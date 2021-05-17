@@ -1065,3 +1065,16 @@ public int result() {
 ```
 
 由此可见，return是再finally之后才进行返回的。
+
+### 1.8.2 Exceptions
+
+> 列举出方法中可能抛出的受查异常（Checked Exceptions）
+
+Exceptions结构如下：
+
+| 类型 | 名称 | 数量 |
+| ---- | ---- | ---- |
+|u2 | attribute_name_index|1|
+|u1 | attribute_length|1|
+|u2 | number_of_exceptions|1|
+|u2 | exception_index_table|number_of_exceptions|
