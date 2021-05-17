@@ -656,16 +656,18 @@ package fan.fe1.hello;
 
 public class Main {
 
-    private static String name = "HelloWorld";
+    private static int value = 1;
 
 
     public static void main(String[] args) {
         try {
-            System.out.println(name);
+            System.out.println(value);
         } catch (Exception e) {
-            e.printStackTrace();
+            value += 1;
+            System.out.println(value);
         } finally {
-            System.out.println(name);
+            value += 2;
+            System.out.println(value);
         }
     }
 }
@@ -674,55 +676,392 @@ public class Main {
 现在我们通过javap查看main方法的代码部分：
 
 ```shell
- public static void main(java.lang.String[]);
+  public static void main(java.lang.String[]);
     descriptor: ([Ljava/lang/String;)V
     flags: (0x0009) ACC_PUBLIC, ACC_STATIC
     Code:
       stack=2, locals=3, args_size=1
          0: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;
-         3: getstatic     #3                  // Field name:Ljava/lang/String;
-         6: invokevirtual #4                  // Method java/io/PrintStream.println:(Ljava/lang/String;)V
-         9: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;
-        12: getstatic     #3                  // Field name:Ljava/lang/String;
-        15: invokevirtual #4                  // Method java/io/PrintStream.println:(Ljava/lang/String;)V
-        18: goto          50
-        21: astore_1
-        22: aload_1
-        23: invokevirtual #6                  // Method java/lang/Exception.printStackTrace:()V
-        26: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;
-        29: getstatic     #3                  // Field name:Ljava/lang/String;
-        32: invokevirtual #4                  // Method java/io/PrintStream.println:(Ljava/lang/String;)V
-        35: goto          50
-        38: astore_2
-        39: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;
-        42: getstatic     #3                  // Field name:Ljava/lang/String;
-        45: invokevirtual #4                  // Method java/io/PrintStream.println:(Ljava/lang/String;)V
-        48: aload_2
-        49: athrow
-        50: return
+         3: getstatic     #3                  // Field value:I
+         6: invokevirtual #4                  // Method java/io/PrintStream.println:(I)V
+         9: getstatic     #3                  // Field value:I
+        12: iconst_2
+        13: iadd
+        14: putstatic     #3                  // Field value:I
+        17: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;
+        20: getstatic     #3                  // Field value:I
+        23: invokevirtual #4                  // Method java/io/PrintStream.println:(I)V
+        26: goto          87
+        29: astore_1
+        30: getstatic     #3                  // Field value:I
+        33: iconst_1
+        34: iadd
+        35: putstatic     #3                  // Field value:I
+        38: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;
+        41: getstatic     #3                  // Field value:I
+        44: invokevirtual #4                  // Method java/io/PrintStream.println:(I)V
+        47: getstatic     #3                  // Field value:I
+        50: iconst_2
+        51: iadd
+        52: putstatic     #3                  // Field value:I
+        55: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;
+        58: getstatic     #3                  // Field value:I
+        61: invokevirtual #4                  // Method java/io/PrintStream.println:(I)V
+        64: goto          87
+        67: astore_2
+        68: getstatic     #3                  // Field value:I
+        71: iconst_2
+        72: iadd
+        73: putstatic     #3                  // Field value:I
+        76: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;
+        79: getstatic     #3                  // Field value:I
+        82: invokevirtual #4                  // Method java/io/PrintStream.println:(I)V
+        85: aload_2
+        86: athrow
+        87: return
       Exception table:
          from    to  target type
-             0     9    21   Class java/lang/Exception
-             0     9    38   any
-            21    26    38   any
+             0     9    29   Class java/lang/Exception
+             0     9    67   any
+            29    47    67   any
       LineNumberTable:
         line 11: 0
-        line 15: 9
-        line 16: 18
-        line 12: 21
-        line 13: 22
-        line 15: 26
-        line 16: 35
-        line 15: 38
-        line 16: 48
-        line 17: 50
+        line 16: 9
+        line 17: 17
+        line 18: 26
+        line 12: 29
+        line 13: 30
+        line 14: 38
+        line 16: 47
+        line 17: 55
+        line 18: 64
+        line 16: 67
+        line 17: 76
+        line 18: 85
+        line 19: 87
       StackMapTable: number_of_entries = 3
-        frame_type = 85 /* same_locals_1_stack_item */
+        frame_type = 93 /* same_locals_1_stack_item */
           stack = [ class java/lang/Exception ]
-        frame_type = 80 /* same_locals_1_stack_item */
+        frame_type = 101 /* same_locals_1_stack_item */
           stack = [ class java/lang/Throwable ]
-        frame_type = 11 /* same */
-
+        frame_type = 19 /* same */
 
 ```
-//TODO
+
+在此代码块中，存在三个异常table，分别是 `0-9->29` `0-9->67` `29-47->67`。
+
+先来看第一段 `from 0 to 9 target 29`:
+
+```shell
+0: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;
+3: getstatic     #3                  // Field value:I
+6: invokevirtual #4                  // Method java/io/PrintStream.println:(I)V
+...
+29: astore_1
+30: getstatic     #3                  // Field value:I
+33: iconst_1
+34: iadd
+35: putstatic     #3                  // Field value:I
+38: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;
+41: getstatic     #3                  // Field value:I
+44: invokevirtual #4                  // Method java/io/PrintStream.println:(I)V
+47: getstatic     #3                  // Field value:I
+50: iconst_2
+51: iadd
+52: putstatic     #3                  // Field value:I
+55: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;
+58: getstatic     #3                  // Field value:I
+61: invokevirtual #4                  // Method java/io/PrintStream.println:(I)V
+64: goto          87                  // Return
+```
+其中 0-6 为正常的输出，如果出现异常 `Class java/lang/Exception` 则跳转到29，
+然后再看29-64，其中 29-44 为：
+```shell
+29: astore_1
+30: getstatic     #3                  // Field value:I
+33: iconst_1
+34: iadd
+35: putstatic     #3                  // Field value:I
+38: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;
+41: getstatic     #3                  // Field value:I
+44: invokevirtual #4                  // Method java/io/PrintStream.println:(I)V
+```
+
+是catch中对变量进行+操作的并输出的操作。
+
+其中 47-64 为：
+```shell
+47: getstatic     #3                  // Field value:I
+50: iconst_2
+51: iadd
+52: putstatic     #3                  // Field value:I
+55: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;
+58: getstatic     #3                  // Field value:I
+61: invokevirtual #4                  // Method java/io/PrintStream.println:(I)V
+64: goto          87                  // Return
+```
+
+是 finally 中对变量进行+操作并输出的操作。合并起来的流程就是： try->catch->finally，前提条件就是拦截到的异常是catch的异常或其子类。
+
+下面再看第二个 `0-9->67`：
+
+```shell
+0: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;
+3: getstatic     #3                  // Field value:I
+6: invokevirtual #4                  // Method java/io/PrintStream.println:(I)V
+...
+67: astore_2
+68: getstatic     #3                  // Field value:I
+71: iconst_2
+72: iadd
+73: putstatic     #3                  // Field value:I
+76: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;
+79: getstatic     #3                  // Field value:I
+82: invokevirtual #4                  // Method java/io/PrintStream.println:(I)V
+85: aload_2
+86: athrow
+87: return 
+```
+0-6依旧是正常的输出，那么67则为出去catch异常的异常发生时，走的finally代码块。
+
+接着再看第三个 `29-47->67`:
+
+```shell
+29: astore_1
+30: getstatic     #3                  // Field value:I
+33: iconst_1
+34: iadd
+35: putstatic     #3                  // Field value:I
+38: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;
+41: getstatic     #3                  // Field value:I
+44: invokevirtual #4                  // Method java/io/PrintStream.println:(I)V
+...
+67: astore_2
+68: getstatic     #3                  // Field value:I
+71: iconst_2
+72: iadd
+73: putstatic     #3                  // Field value:I
+76: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;
+79: getstatic     #3                  // Field value:I
+82: invokevirtual #4                  // Method java/io/PrintStream.println:(I)V
+85: aload_2
+86: athrow
+87: return 
+```
+上文说过 27-44为catch中的代码块，如果catch发生任何异常，则转到finally块。
+
+总结一下异常：
+- 如果try出现异常，异常属于catch，则跳转catch
+- 如果try出现异常，异常不属于catch，则跳转finally
+- 如果catch出现任何异常，则跳转finally
+
+这里就引申出来一个新的问题，try 和 catch 里吗存在return 时，finally代码块是否会执行，什么时候执行，如果有return是否会覆盖上面的return ？
+
+我们新增一个result方法：
+```java
+public int result() {
+        try {
+            value ++;
+            System.out.println("try");
+            return value;
+        } catch (Exception e) {
+            value ++;
+            System.out.println("catch");
+            return value;
+        } finally {
+            value ++;
+            System.out.println("finally");
+            return value;
+        }
+    }
+```
+
+查看编译后的字节码:
+
+```shell
+  public int result();
+    descriptor: ()I
+    flags: (0x0001) ACC_PUBLIC
+    Code:
+      stack=2, locals=4, args_size=1
+         0: getstatic     #2                  // Field value:I
+         3: iconst_1
+         4: iadd
+         5: putstatic     #2                  // Field value:I
+         8: getstatic     #3                  // Field java/lang/System.out:Ljava/io/PrintStream;
+        11: ldc           #4                  // String try
+        13: invokevirtual #5                  // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+        16: getstatic     #2                  // Field value:I
+        19: istore_1
+        20: getstatic     #2                  // Field value:I
+        23: iconst_1
+        24: iadd
+        25: putstatic     #2                  // Field value:I
+        28: getstatic     #3                  // Field java/lang/System.out:Ljava/io/PrintStream;
+        31: ldc           #6                  // String finally
+        33: invokevirtual #5                  // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+        36: getstatic     #2                  // Field value:I
+        39: ireturn
+        40: astore_1
+        41: getstatic     #2                  // Field value:I
+        44: iconst_1
+        45: iadd
+        46: putstatic     #2                  // Field value:I
+        49: getstatic     #3                  // Field java/lang/System.out:Ljava/io/PrintStream;
+        52: ldc           #8                  // String catch
+        54: invokevirtual #5                  // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+        57: getstatic     #2                  // Field value:I
+        60: istore_2
+        61: getstatic     #2                  // Field value:I
+        64: iconst_1
+        65: iadd
+        66: putstatic     #2                  // Field value:I
+        69: getstatic     #3                  // Field java/lang/System.out:Ljava/io/PrintStream;
+        72: ldc           #6                  // String finally
+        74: invokevirtual #5                  // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+        77: getstatic     #2                  // Field value:I
+        80: ireturn
+        81: astore_3
+        82: getstatic     #2                  // Field value:I
+        85: iconst_1
+        86: iadd
+        87: putstatic     #2                  // Field value:I
+        90: getstatic     #3                  // Field java/lang/System.out:Ljava/io/PrintStream;
+        93: ldc           #6                  // String finally
+        95: invokevirtual #5                  // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+        98: getstatic     #2                  // Field value:I
+       101: ireturn
+      Exception table:
+         from    to  target type
+             0    20    40   Class java/lang/Exception
+             0    20    81   any
+            40    61    81   any
+      LineNumberTable:
+        line 10: 0
+        line 11: 8
+        line 12: 16
+        line 18: 20
+        line 19: 28
+        line 20: 36
+        line 13: 40
+        line 14: 41
+        line 15: 49
+        line 16: 57
+        line 18: 61
+        line 19: 69
+        line 20: 77
+        line 18: 81
+        line 19: 90
+        line 20: 98
+      StackMapTable: number_of_entries = 2
+        frame_type = 104 /* same_locals_1_stack_item */
+          stack = [ class java/lang/Exception ]
+        frame_type = 104 /* same_locals_1_stack_item */
+          stack = [ class java/lang/Throwable ]
+
+```
+由上面字节码分析可知，无论有没有异常，finally的return才会真正的返回。
+
+我们再去掉 finally 里的return：
+```java
+public int result() {
+        try {
+            value ++;
+            System.out.println("try");
+            return value;
+        } catch (Exception e) {
+            value ++;
+            System.out.println("catch");
+            return value;
+        } finally {
+            value ++;
+            System.out.println("finally");
+        }
+    }
+```
+
+字节码：
+```shell
+  public int result();
+    descriptor: ()I
+    flags: (0x0001) ACC_PUBLIC
+    Code:
+      stack=2, locals=4, args_size=1
+         0: getstatic     #2                  // Field value:I
+         3: iconst_1
+         4: iadd
+         5: putstatic     #2                  // Field value:I
+         8: getstatic     #3                  // Field java/lang/System.out:Ljava/io/PrintStream;
+        11: ldc           #4                  // String try
+        13: invokevirtual #5                  // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+        16: getstatic     #2                  // Field value:I
+        19: istore_1
+        20: getstatic     #2                  // Field value:I
+        23: iconst_1
+        24: iadd
+        25: putstatic     #2                  // Field value:I
+        28: getstatic     #3                  // Field java/lang/System.out:Ljava/io/PrintStream;
+        31: ldc           #6                  // String finally
+        33: invokevirtual #5                  // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+        36: iload_1
+        37: ireturn
+        38: astore_1
+        39: getstatic     #2                  // Field value:I
+        42: iconst_1
+        43: iadd
+        44: putstatic     #2                  // Field value:I
+        47: getstatic     #3                  // Field java/lang/System.out:Ljava/io/PrintStream;
+        50: ldc           #8                  // String catch
+        52: invokevirtual #5                  // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+        55: getstatic     #2                  // Field value:I
+        58: istore_2
+        59: getstatic     #2                  // Field value:I
+        62: iconst_1
+        63: iadd
+        64: putstatic     #2                  // Field value:I
+        67: getstatic     #3                  // Field java/lang/System.out:Ljava/io/PrintStream;
+        70: ldc           #6                  // String finally
+        72: invokevirtual #5                  // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+        75: iload_2
+        76: ireturn
+        77: astore_3
+        78: getstatic     #2                  // Field value:I
+        81: iconst_1
+        82: iadd
+        83: putstatic     #2                  // Field value:I
+        86: getstatic     #3                  // Field java/lang/System.out:Ljava/io/PrintStream;
+        89: ldc           #6                  // String finally
+        91: invokevirtual #5                  // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+        94: aload_3
+        95: athrow
+      Exception table:
+         from    to  target type
+             0    20    38   Class java/lang/Exception
+             0    20    77   any
+            38    59    77   any
+      LineNumberTable:
+        line 10: 0
+        line 11: 8
+        line 12: 16
+        line 18: 20
+        line 19: 28
+        line 12: 36
+        line 13: 38
+        line 14: 39
+        line 15: 47
+        line 16: 55
+        line 18: 59
+        line 19: 67
+        line 16: 75
+        line 18: 77
+        line 19: 86
+        line 20: 94
+      StackMapTable: number_of_entries = 2
+        frame_type = 102 /* same_locals_1_stack_item */
+          stack = [ class java/lang/Exception ]
+        frame_type = 102 /* same_locals_1_stack_item */
+          stack = [ class java/lang/Throwable ]
+
+```
+
+由此可见，return是再finally之后才进行返回的。
