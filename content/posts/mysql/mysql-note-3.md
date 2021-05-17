@@ -40,7 +40,7 @@ draft: true
 - HASH
 
 ### B+树
-此数不再赘述数据结构，如需了解查看：[数据结构与算法](https://fe1.fan/posts/data_structures_algorithms/data_structures_algorithms_1.md)
+此数不再赘述数据结构，如需了解查看：[数据结构与算法](https://fe1.fan/tags/data-structures-algorithms/)
 
 在InnoDB中，每个索引对应一棵B+树。
 
