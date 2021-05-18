@@ -1,0 +1,49 @@
+<!doctype html><html><head><title>MySQL 笔记6：存储 // Fe1Fan</title><meta charset=utf-8><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1"><meta name=description content="学习笔记"><meta property="og:title" content="MySQL 笔记6：存储"><meta property="og:description" content="学习笔记"><meta property="og:type" content="website"><meta property="og:locale" content="en"><meta property="og:url" content="https://fe1.fan/posts/mysql/mysql-note-6/"><link rel="shortcut icon" href=/favicon.ico><link href=https://fe1.fan/webfonts/ptserif/main.css rel=stylesheet type=text/css><link href=https://fe1.fan/webfonts/source-code-pro/main.css rel=stylesheet type=text/css><link rel=stylesheet href=https://fe1.fan/css/style.css><meta name=generator content="Hugo 0.75.1"></head><body><div id=container><header id=header><div id=header-outer class=outer><div id=header-inner class=inner><a id=main-nav-toggle class=nav-icon href=javascript:;></a><a id=logo class=logo-text href=https://fe1.fan/>Fe1Fan</a><nav id=main-nav><a class=main-nav-link href=/>主页</a>
+<a class=main-nav-link href=/tags/>归档</a>
+<a class=main-nav-link href=/about/>关于</a>
+<a class=main-nav-link href=/index.xml>订阅</a></nav><nav id=sub-nav><div id=search-form-wrap></div></nav></div></div></header><section id=main class=outer><article class="article article-type-post" itemscope itemprop=blogPost><div class=article-inner><header class=article-header><h1 class=article-title itemprop=name>MySQL 笔记6：存储</h1></header><div class=article-meta><a href="/posts/mysql/mysql-note-6/?uid=91a329063146eef058647ad7f523b337" class=article-date><time datetime=2020-10-07T14:23:52.000+08:00 itemprop=datePublished>2020-10-07</time></a></div><div class=article-entry itemprop=articleBody><h1 id=存储>存储</h1><p>本文以InnoDB为例，讲述MySQL InnoDB引擎的存储结构。</p><h2 id=10-页>1.0 页</h2><p>我们将数据放入MySQL，MySQL会写入磁盘文件，而真正的数据处理过程发生在内存中，所以需要把磁盘中的数据加载到内存中，如果是处理写入或修改请求，
+还需要把内存中的数据刷新到磁盘，当我们从表中获取某些数据时，InnoDB采取的方式是：
+将数据划分为若干个页，以页作为磁盘和内存之间交互的基本单位，InnoDB中页的大小一般为 16KB，也就是说，在一般情况下，一次最少从磁盘中读取16K的
+内容到内存中，写入也是一次最少16KB。</p><h2 id=20-行格式>2.0 行格式</h2><p>当我们以记录为单位向表中插入数据，这些记录在磁盘上存放的格式被称为行格式或者记录格式。</p><p>InnoDB中的行格式如下：</p><ul><li>Compact</li><li>Redundant</li><li>Dynamic</li><li>Compressed</li></ul><p>指定行格式：</p><pre><code class=language-sql>CREATE TABLE test ROW_FORMAT=Compact
+ALTER TABLE test ROW_FORMAT=Compact
+</code></pre><h3 id=21-compact>2.1 Compact</h3><p>结构：</p><pre><code class=language-shell>[变长字段长度列表][NULL值列表][记录头信息]  [列1的值][列2的值]...[列N的值]
+|------------------------------------||--------------------------|
+            记录额外信息                      记录真实数据
+</code></pre><p>记录额外信息：</p><p>这部分信息是服务器为了描述这条记录而不得不添加的一些信息。</p><h4 id=211-变长字段长度列表>2.1.1 变长字段长度列表</h4><p>主要用于记录VARCHAR VARBINARY TEXT 这种不固定长度占用的字节数，<strong>以逆序放</strong>，所以说这些数据被分为两部分记录，一部分为真实的数据、一部分为占用的字节数。</p><p>假如表结构：</p><pre><code class=language-sql>CREATE TABLE record_format_demo (
+    -&gt;     c1 VARCHAR(10),
+    -&gt;     c2 VARCHAR(10) NOT NULL,
+    -&gt;     c3 CHAR(10),
+    -&gt;     c4 VARCHAR(10)
+    -&gt; ) CHARSET=ascii ROW_FORMAT=COMPACT;
+</code></pre><p>数据：</p><pre><code class=language-shell>+------+-----+------+------+
+| c1   | c2  | c3   | c4   |
++------+-----+------+------+
+| aaaa | bbb | cc   | d    |
+| eeee | fff | NULL | NULL |
++------+-----+------+------+
+</code></pre><p>表使用ascii编码，所以每个字符只需要1个字节进行编码，所以长度为：</p><table><thead><tr><th>列名</th><th>内容</th><th>长度</th><th>长度0x</th></tr></thead><tbody><tr><td>c1</td><td>&lsquo;aaaa&rsquo;</td><td>4</td><td>0x04</td></tr><tr><td>c2</td><td>&lsquo;bbb&rsquo;</td><td>3</td><td>0x03</td></tr><tr><td>c4</td><td>&rsquo;d'</td><td>1</td><td>0x01</td></tr></tbody></table><p>将这些长度倒叙存放，我们得到数据：</p><pre><code class=language-shell>010304
+</code></pre><p>所以 <code>[变长字段长度列表] = 010304</code>。</p><p>由于当前表采用ascii编码且c1、c2、c4字符串较短，长度用1个字节就可以表示，如果字符串较长时，就需要2个字节来表示。</p><p>InnoDB计算需要几个字节来表示的规则:</p><p>首先声明 W、M、L的意思</p><ul><li>W</li></ul><p>字符集表示一个字符最多需要的字节数，例如utf8 W=3（这里注意，MySQL utf8字符集采用最多3字节数，utf8mb4采用最多4字节数），gbk W=2，ascii W=1。</p><ul><li>M</li></ul><p>对于VARCHAR(M) 这种可变长度的类型来说，这个类型最多存储M个字符（不是字节），所以说最多存储的字节数为 MxW。</p><ul><li>L</li></ul><p>假设它实际存储的字符串占用的字节数是L。（这里的L并不是获取到的真实占用字节数，而是代表占用字节数的第一个字节）</p><p>InnoDB计算规则如下：</p><ul><li><p>如果 <code>MxW &lt;= 255</code> 那么采用1字节来表示真正的字符串占用字节数。</p><p>InnoDB在读记录的变长字段长度列表时，先查看表结构，如果某个变长字段允许储存的最大字节数不超过255，那么认为只是用1个字节来表示占用字节数。</p></li><li><p>如果 <code>MxW > 255</code></p><ul><li><code>L &lt;= 127</code> 则采用1字节表示。</li><li><code>L > 127</code> 则采用2字节表示。</li></ul><p>InnoDB在读记录的变长字段长度列表时先查看表结构，如果某个字段允许存储最大字节数超过255时，假如值为 <code>0x7F</code> 二进制的 <code>0111 1111</code>，当读取到二进制的第一位为0时，
+那么该字节就是一个完整的字段长度，假如值为 <code>0x80</code> 二进制的 <code>1000 0000</code>，那么该字节为半个字段长度，当字段很长时，InnoDB会把一部分数据放到溢出页（后续），
+使得留在本页面中的长度使用两个字节也可存放。</p></li></ul><pre><code>//这里记录一下，以防忘记
+当第一个字节的二进制的第一位为0时，它的最大值为 0x7F，也就是二进制的 0111 1111，十进制的127
+当第一个字节的二进制的第一位为1时，他的最小值为 0x80，也就是二进制的 1000 0000，十进制的128，最大值为255
+//用7位二进制代表数字理论上为2^7=128个，为什么最大值127而不是128 ？因为有 000 0000 = 0 的情况
+//8位二进制 255同上
+
+//这里为什么要这么设计？（猜想）
+在无法分辨当前字节数是需要一位还是两位来表示时：
+
+那么当第一个字节的二进制的第一位为0时，最大值 0111 1111 代表着还有一位空余未使用到。
+
+那么当第一个字节的二进制的第一位为1时，最大值 1111 1111 那么极有可能超出了一字节能代表的数字（255）。
+
+如果这里采用如果第一个字节的二进制的第一位为1时
+就判断第二位是否为0空闲，如果第二位同样为1时，
+就继续判断第三位是否为0空闲。
+当全部值都为1时，则使用两个字节表示。
+会变成牺牲性能节省空间，不可取。
+</code></pre><h4 id=212-null值列表>2.1.2 NULL值列表</h4><p>在列表中某些列可能存储<code>NULL</code>值，如果把<code>NULL</code>值放在记录的真实数据中存储会很占地方，所以Compact行格式会把这些值统一管理，
+存储到NULL值列表中，存储过程如下：</p><p>1.统计表中允许存储NULL的列又哪些。</p><p>主键列、被NOT NULL修饰的列都不可以存储NULL值。</p><p>2.如果表中没有允许存储 NULL 的列，则 NULL值列表 也不存在了，否则将每个允许存储NULL的列对应一个二进制位，二进制位按照列的顺序逆序排列，二进制位表示的意义如下：</p><ul><li>1 代表该列值为 NULL</li><li>0 代表该列值不为NULL</li></ul><p>同样NULL值列表也是按照逆序排列。</p><p>3.MySQL规定 NULL值列表必须用整个字节位表示，如果不足整个位字节，则高位补0。如果超过一个字节数量的列允许为NULL，则采用两个字节表示。
+对于我们的数据，c1、c3、c4 允许为 NULL，那么第一列的NULL值列表为：00000000，第二列的值 c3、c4都为 NULL，那么NULL值列表为：00000110
+00000000顺序为：00000c4c3c1，00000110同样为：00000c4c3c1。</p><h4 id=213-记录头信息>2.1.3 记录头信息</h4><p>//TODO</p></div><div class=article-toc><h3>Contents</h3><nav id=TableOfContents><ul><li><a href=#10-页>1.0 页</a></li><li><a href=#20-行格式>2.0 行格式</a><ul><li><a href=#21-compact>2.1 Compact</a></li></ul></li></ul></nav></div><footer class=article-footer><ul class=article-tag-list><li class=article-tag-list-item><a class=article-tag-list-link href=https://fe1.fan/tags/mysql>mysql</a></li></ul></footer></div><nav id=article-nav><a href=/posts/mysql/mysql-note-2/ id=article-nav-newer class=article-nav-link-wrap><div class=article-nav-title><span>&lt;</span>&nbsp;
+MySQL 笔记2：架构</div></a></nav></article></section><footer id=footer><div class=outer><div id=footer-info class=inner>&copy; 2021 Fe1Fan<br>Powered by <a href=https://gohugo.io target=_blank>Hugo</a> with theme <a href=https://github.com/carsonip/hugo-theme-minos target=_blank>Minos</a></div></div><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/tomorrow-night.min.css integrity="sha256-2wL88NKUqvJi/ExflDzkzUumjUM73mcK2gBvBBeLvTk=" crossorigin=anonymous><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js integrity="sha256-KbfTjB0WZ8vvXngdpJGY3Yp3xKk+tttbqClO11anCIU=" crossorigin=anonymous></script><script>hljs.initHighlightingOnLoad();</script><script>document.getElementById('main-nav-toggle').addEventListener('click',function(){var header=document.getElementById('header');if(header.classList.contains('mobile-on')){header.classList.remove('mobile-on');}else{header.classList.add('mobile-on');}});</script></footer></div></body></html>
