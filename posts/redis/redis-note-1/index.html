@@ -1,0 +1,71 @@
+<!doctype html><html><head><title>Redis 笔记1：基础 // Fe1Fan</title><meta charset=utf-8><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1"><meta name=description content="学习笔记"><meta property="og:title" content="Redis 笔记1：基础"><meta property="og:description" content="学习笔记"><meta property="og:type" content="website"><meta property="og:locale" content="en"><meta property="og:url" content="https://fe1.fan/posts/redis/redis-note-1/"><link rel="shortcut icon" href=/favicon.ico><link href=https://fe1.fan/webfonts/ptserif/main.css rel=stylesheet type=text/css><link href=https://fe1.fan/webfonts/source-code-pro/main.css rel=stylesheet type=text/css><link rel=stylesheet href=https://fe1.fan/css/style.css><meta name=generator content="Hugo 0.75.1"></head><body><div id=container><header id=header><div id=header-outer class=outer><div id=header-inner class=inner><a id=main-nav-toggle class=nav-icon href=javascript:;></a><a id=logo class=logo-text href=https://fe1.fan/>Fe1Fan</a><nav id=main-nav><a class=main-nav-link href=/>主页</a>
+<a class=main-nav-link href=/tags/>归档</a>
+<a class=main-nav-link href=/about/>关于</a>
+<a class=main-nav-link href=/index.xml>订阅</a></nav><nav id=sub-nav><div id=search-form-wrap></div></nav></div></div></header><section id=main class=outer><article class="article article-type-post" itemscope itemprop=blogPost><div class=article-inner><header class=article-header><h1 class=article-title itemprop=name>Redis 笔记1：基础</h1></header><div class=article-meta><a href="/posts/redis/redis-note-1/?uid=45b59754d5339f8cd6300afeda31fd48" class=article-date><time datetime=2020-10-07T14:23:52.000+08:00 itemprop=datePublished>2020-10-07</time></a></div><div class=article-entry itemprop=articleBody><h1 id=基础数据结构>基础数据结构</h1><ul><li>string</li><li>list</li><li>hash</li><li>set</li><li>zset</li></ul><h2 id=string>string</h2><h3 id=简介>简介</h3><p>string是Redis中最常用的数据结构，其长度是可变的，采用的内存分配策略是
+预分配冗余空间的方式来减少内存的频繁分配，当字符串长度小于 1M 时，扩容都是加倍现有的空间，如果超过 1M，扩容时一次只会多扩 1M 的空间。
+需要注意的是字符串最大长度为 512M。</p><h3 id=使用>使用</h3><p>常用</p><pre><code class=language-shell>set k v
+get k v
+mset k1 v1 k2 v2 k3 v3
+mget k1 k2 k3
+</code></pre><p>过期</p><pre><code class=language-shell>#过期
+expire k 5  #5秒后过期
+setex k 5 v
+setnx k 5 v #创建并过期 如果k不存在则创建，如果存在则不变。
+</code></pre><p>计数</p><pre><code class=language-shell>set k 10
+incr k
+&gt; 11
+incrby k 5
+&gt; 16
+incrby k -5
+&gt; 11
+</code></pre><h2 id=list>list</h2><h3 id=简介-1>简介</h3><p>Redis中的list是双向链表而不是数组，这意味着插入和删除非常快，但是索引很慢。当列表弹出了最后一个元素之后，该数据结构自动被删除，内存被回收。
+因为底层是连续的内存块，所以速度很块。</p><h3 id=使用-1>使用</h3><p>右进左出：队列</p><pre><code class=language-shell>rpush lk v1 v2 v3 v4
+llen lk
+&gt; 4
+lpop lk
+&gt; v1
+lpop lk
+&gt; v2
+</code></pre><p>右进右出：栈</p><pre><code class=language-shell>rpush lk v1 v2 v3 v4
+llen lk
+&gt; 4
+lpop lk
+&gt; v4
+lpop lk
+&gt; v3
+</code></pre><p>获取值：</p><pre><code class=language-shell>rpush lk v1 v2 v3 v4
+llen lk
+&gt; 4
+lindex lk 1 #查找第一个元素
+&gt; v1
+lrange lk 0 -1 # 查找所有元素 -1代表倒数第一个元素
+&gt; 1) v1
+&gt; 2) v2
+&gt; 3) v3
+&gt; 4) v4
+ltrim lk 1 -1   # 保留
+lrange lk 0 -1
+&gt; v1
+&gt; v2
+ltrim lk 1 0
+llen lk
+&gt; 0
+</code></pre><h2 id=hash>hash</h2><h3 id=简介-2>简介</h3><p>Redis Hash 使用数组 + 链表二维结构，如果hash碰撞，则放到对应hash的链表中。
+Redis的值只能是字符串，</p><h3 id=使用-2>使用</h3><pre><code class=language-shell>hset hk k1 v1
+hset hk k2 v2
+hlen hk
+&gt; 2
+hgetall hk
+&gt; k1
+&gt; v1
+&gt; k2
+&gt; v2
+hget hk k1
+&gt; v1
+hset hk k1 v3
+hget hk k1
+&gt; v3
+# 根据单个key计算
+
+</code></pre></div><div class=article-toc><h3>Contents</h3><nav id=TableOfContents><ul><li><a href=#string>string</a><ul><li><a href=#简介>简介</a></li><li><a href=#使用>使用</a></li></ul></li><li><a href=#list>list</a><ul><li><a href=#简介-1>简介</a></li><li><a href=#使用-1>使用</a></li></ul></li><li><a href=#hash>hash</a><ul><li><a href=#简介-2>简介</a></li><li><a href=#使用-2>使用</a></li></ul></li></ul></nav></div><footer class=article-footer><ul class=article-tag-list><li class=article-tag-list-item><a class=article-tag-list-link href=https://fe1.fan/tags/redis>redis</a></li></ul></footer><script>MathJax={tex:{inlineMath:[["$","$"]],},displayMath:[["$$","$$"],["\[\[","\]\]"],],svg:{fontCache:"global",},};</script><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script><script id=MathJax-script async src=https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js></script></div><nav id=article-nav><a href=/posts/mysql/mysql-note-6/ id=article-nav-newer class=article-nav-link-wrap><div class=article-nav-title><span>&lt;</span>&nbsp;
+MySQL 笔记6：存储</div></a></nav></article></section><footer id=footer><div class=outer><div id=footer-info class=inner>&copy; 2021 Fe1Fan<br>Powered by <a href=https://gohugo.io target=_blank>Hugo</a> with theme <a href=https://github.com/carsonip/hugo-theme-minos target=_blank>Minos</a></div></div><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/tomorrow-night.min.css integrity="sha256-2wL88NKUqvJi/ExflDzkzUumjUM73mcK2gBvBBeLvTk=" crossorigin=anonymous><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js integrity="sha256-KbfTjB0WZ8vvXngdpJGY3Yp3xKk+tttbqClO11anCIU=" crossorigin=anonymous></script><script>hljs.initHighlightingOnLoad();</script><script>document.getElementById('main-nav-toggle').addEventListener('click',function(){var header=document.getElementById('header');if(header.classList.contains('mobile-on')){header.classList.remove('mobile-on');}else{header.classList.add('mobile-on');}});</script></footer></div></body></html>
