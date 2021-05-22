@@ -64,6 +64,7 @@ Native方法栈，HotSpot虚拟机把本地方法栈和虚拟机栈合二为一
 
 ### HotSpot：
 ![HotSpot](https://i.loli.net/2020/10/08/lxTiXe2rzF83PWo.png)
+
 - Old 老年代
 - Eden 新生代
 - Survivor0 临时交换区0
