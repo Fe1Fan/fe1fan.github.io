@@ -127,3 +127,66 @@ hget hk k1
 # 根据单个key计算
 
 ```
+
+## set
+
+### 简介
+
+Redis Set 相当于 Java重的 HashSet，内部键值对是无序且唯一的，内部实现相当于一个特殊的字典，字典的value都是NULL。
+
+set 结构可以用来存储活动中奖的用户 ID，因为有去重功能，可以保证同一个用户不会中奖两次。
+
+### 使用
+
+```shell
+sadd sk v1
+sadd sk v2
+sadd sk v3 v4
+smembers sk
+> v3 v1 v4 v2
+sismember sk v3
+> (integer) 1
+scard sk  # 长度
+> (integer) 4
+spop sk   # 弹出一个
+> v3
+```
+
+## zset
+
+### 简介
+ZSet 一方面保证内部value的唯一性，另一方面它可以给每个value赋予一个score，代表这个value的排序权重，内部实现是跳表的数据结构。
+
+ZSet 可以用来存粉丝列表，value 值是粉丝的用户 ID，score 是关注时间。我们可以对粉丝列表按关注时间进行排序。
+ZSet 还可以用来存储学生的成绩，value 值是学生的 ID，score 是他的考试成绩。我们可以对成绩按分数进行排序就可以得到他的名次。
+
+### 使用
+```shell
+zadd zk 9.0 v1
+zadd zk 8.9 v2
+zadd zk 8.6 v3
+zrange zk 0 -1 # 按source排序，参数区间为排名范围
+> v3
+> v2
+> v1
+zrevrange zk 0 -1 # 逆序
+> v1
+> v2
+> v3
+zcard zk #总数
+> (integer) 3
+zscore zk v1 #获取score
+> 8.9000000000000004 # double进行存储，所以存在精度问题。
+zrank zk v1 # 排名
+> (integer) 1
+zrangebyscore zk 0 8.91 # 根据分值区间遍历
+zrangebyscore zk -inf 8.91 withscores #根据分值区间 (-∞, 8.91] 遍历 zset，同时返回分值。inf 代表 infinite，无穷大的意思。
+zrem zk v1 # 删除
+zrange zk 0 -1 #遍历
+```
+
+
+
+
+
+
