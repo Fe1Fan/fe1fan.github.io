@@ -67,5 +67,38 @@ hget hk k1
 &gt; v3
 # 根据单个key计算
 
-</code></pre></div><div class=article-toc><h3>Contents</h3><nav id=TableOfContents><ul><li><a href=#string>string</a><ul><li><a href=#简介>简介</a></li><li><a href=#使用>使用</a></li></ul></li><li><a href=#list>list</a><ul><li><a href=#简介-1>简介</a></li><li><a href=#使用-1>使用</a></li></ul></li><li><a href=#hash>hash</a><ul><li><a href=#简介-2>简介</a></li><li><a href=#使用-2>使用</a></li></ul></li></ul></nav></div><footer class=article-footer><ul class=article-tag-list><li class=article-tag-list-item><a class=article-tag-list-link href=https://fe1.fan/tags/redis>redis</a></li></ul></footer><script>MathJax={tex:{inlineMath:[["$","$"]],},displayMath:[["$$","$$"],["\[\[","\]\]"],],svg:{fontCache:"global",},};</script><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script><script id=MathJax-script async src=https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js></script></div><nav id=article-nav><a href=/posts/mysql/mysql-note-6/ id=article-nav-newer class=article-nav-link-wrap><div class=article-nav-title><span>&lt;</span>&nbsp;
+</code></pre><h2 id=set>set</h2><h3 id=简介-3>简介</h3><p>Redis Set 相当于 Java重的 HashSet，内部键值对是无序且唯一的，内部实现相当于一个特殊的字典，字典的value都是NULL。</p><p>set 结构可以用来存储活动中奖的用户 ID，因为有去重功能，可以保证同一个用户不会中奖两次。</p><h3 id=使用-3>使用</h3><pre><code class=language-shell>sadd sk v1
+sadd sk v2
+sadd sk v3 v4
+smembers sk
+&gt; v3 v1 v4 v2
+sismember sk v3
+&gt; (integer) 1
+scard sk  # 长度
+&gt; (integer) 4
+spop sk   # 弹出一个
+&gt; v3
+</code></pre><h2 id=zset>zset</h2><h3 id=简介-4>简介</h3><p>ZSet 一方面保证内部value的唯一性，另一方面它可以给每个value赋予一个score，代表这个value的排序权重，内部实现是跳表的数据结构。</p><p>ZSet 可以用来存粉丝列表，value 值是粉丝的用户 ID，score 是关注时间。我们可以对粉丝列表按关注时间进行排序。
+ZSet 还可以用来存储学生的成绩，value 值是学生的 ID，score 是他的考试成绩。我们可以对成绩按分数进行排序就可以得到他的名次。</p><h3 id=使用-4>使用</h3><pre><code class=language-shell>zadd zk 9.0 v1
+zadd zk 8.9 v2
+zadd zk 8.6 v3
+zrange zk 0 -1 # 按source排序，参数区间为排名范围
+&gt; v3
+&gt; v2
+&gt; v1
+zrevrange zk 0 -1 # 逆序
+&gt; v1
+&gt; v2
+&gt; v3
+zcard zk #总数
+&gt; (integer) 3
+zscore zk v1 #获取score
+&gt; 8.9000000000000004 # double进行存储，所以存在精度问题。
+zrank zk v1 # 排名
+&gt; (integer) 1
+zrangebyscore zk 0 8.91 # 根据分值区间遍历
+zrangebyscore zk -inf 8.91 withscores #根据分值区间 (-∞, 8.91] 遍历 zset，同时返回分值。inf 代表 infinite，无穷大的意思。
+zrem zk v1 # 删除
+zrange zk 0 -1 #遍历
+</code></pre></div><div class=article-toc><h3>Contents</h3><nav id=TableOfContents><ul><li><a href=#string>string</a><ul><li><a href=#简介>简介</a></li><li><a href=#使用>使用</a></li></ul></li><li><a href=#list>list</a><ul><li><a href=#简介-1>简介</a></li><li><a href=#使用-1>使用</a></li></ul></li><li><a href=#hash>hash</a><ul><li><a href=#简介-2>简介</a></li><li><a href=#使用-2>使用</a></li></ul></li><li><a href=#set>set</a><ul><li><a href=#简介-3>简介</a></li><li><a href=#使用-3>使用</a></li></ul></li><li><a href=#zset>zset</a><ul><li><a href=#简介-4>简介</a></li><li><a href=#使用-4>使用</a></li></ul></li></ul></nav></div><footer class=article-footer><ul class=article-tag-list><li class=article-tag-list-item><a class=article-tag-list-link href=https://fe1.fan/tags/redis>redis</a></li></ul></footer><script>MathJax={tex:{inlineMath:[["$","$"]],},displayMath:[["$$","$$"],["\[\[","\]\]"],],svg:{fontCache:"global",},};</script><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script><script id=MathJax-script async src=https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js></script></div><nav id=article-nav><a href=/posts/mysql/mysql-note-6/ id=article-nav-newer class=article-nav-link-wrap><div class=article-nav-title><span>&lt;</span>&nbsp;
 MySQL 笔记6：存储</div></a></nav></article></section><footer id=footer><div class=outer><div id=footer-info class=inner>&copy; 2021 Fe1Fan<br>Powered by <a href=https://gohugo.io target=_blank>Hugo</a> with theme <a href=https://github.com/carsonip/hugo-theme-minos target=_blank>Minos</a></div></div><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/tomorrow-night.min.css integrity="sha256-2wL88NKUqvJi/ExflDzkzUumjUM73mcK2gBvBBeLvTk=" crossorigin=anonymous><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js integrity="sha256-KbfTjB0WZ8vvXngdpJGY3Yp3xKk+tttbqClO11anCIU=" crossorigin=anonymous></script><script>hljs.initHighlightingOnLoad();</script><script>document.getElementById('main-nav-toggle').addEventListener('click',function(){var header=document.getElementById('header');if(header.classList.contains('mobile-on')){header.classList.remove('mobile-on');}else{header.classList.add('mobile-on');}});</script></footer></div></body></html>
