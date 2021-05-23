@@ -304,7 +304,7 @@ ZSet 还可以用来存储学生的成绩，value 值是学生的 ID，score 是
 zadd zk 9.0 v1
 zadd zk 8.9 v2
 zadd zk 8.6 v3
-zrange zk 0 -1 # 按source排序，参数区间为排名范围
+zrange zk 0 -1 # score，参数区间为排名范围
 > v3
 > v2
 > v1
