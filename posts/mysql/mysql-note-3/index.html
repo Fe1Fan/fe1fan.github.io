@@ -1,0 +1,49 @@
+<!doctype html><html><head><title>MySQL 笔记3：索引 // Fe1Fan</title><meta charset=utf-8><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1"><meta name=description content="学习笔记"><meta property="og:title" content="MySQL 笔记3：索引"><meta property="og:description" content="学习笔记"><meta property="og:type" content="website"><meta property="og:locale" content="en"><meta property="og:url" content="https://fe1.fan/posts/mysql/mysql-note-3/"><link rel="shortcut icon" href=/favicon.ico><link href=https://fe1.fan/webfonts/ptserif/main.css rel=stylesheet type=text/css><link href=https://fe1.fan/webfonts/source-code-pro/main.css rel=stylesheet type=text/css><link rel=stylesheet href=https://fe1.fan/css/style.css><meta name=generator content="Hugo 0.75.1"></head><body><div id=container><header id=header><div id=header-outer class=outer><div id=header-inner class=inner><a id=main-nav-toggle class=nav-icon href=javascript:;></a><a id=logo class=logo-text href=https://fe1.fan/>Fe1Fan</a><nav id=main-nav><a class=main-nav-link href=/>主页</a>
+<a class=main-nav-link href=/tags/>归档</a>
+<a class=main-nav-link href=/about/>关于</a>
+<a class=main-nav-link href=/index.xml>订阅</a></nav><nav id=sub-nav><div id=search-form-wrap></div></nav></div></div></header><section id=main class=outer><article class="article article-type-post" itemscope itemprop=blogPost><div class=article-inner><header class=article-header><h1 class=article-title itemprop=name>MySQL 笔记3：索引</h1></header><div class=article-meta><a href="/posts/mysql/mysql-note-3/?uid=4b3d343a5475deb39d4bc40e0d998319" class=article-date><time datetime=2020-10-07T14:23:52.000+08:00 itemprop=datePublished>2020-10-07</time></a></div><div class=article-entry itemprop=articleBody><h2 id=11-索引>1.1 索引</h2><blockquote><p>索引概念类似于书的目录，目的是提高数据查询效率。</p></blockquote><hr><h2 id=12-索引类型>1.2 索引类型</h2><h3 id=121-根据底层数据结构划分>1.2.1 根据底层数据结构划分</h3><ul><li>B+树</li></ul><p>使用B+树存储结构的索引</p><ul><li>HASH</li></ul><p>使用HASH存储结构的索引</p><h3 id=122-根据索引字段个数划分>1.2.2 根据索引字段个数划分</h3><ul><li>单值索引</li></ul><p>单个字段组成的索引</p><ul><li>复合索引(组合索引或多值索引)</li></ul><p>多个字段组成的索引</p><h3 id=123-根据是否是在主键上建立的索引进行划分>1.2.3 根据是否是在主键上建立的索引进行划分</h3><ul><li>主键索引</li></ul><p>MySQL根据主键来组织数据，每张表都存在主键索引，如果没有设置主键索引将自动生成隐藏字段作为索引。</p><ul><li>辅助索引</li></ul><p>如果不是主键索引，则成为非主键索引（辅助索引、二级索引），区别是主键索引上的叶子结点存储了完整的数据行，而非主键索引存储的则是主键索引的值，查询数据有回表操作。</p><h3 id=124-根据数据与索引的存储关联性划分>1.2.4 根据数据与索引的存储关联性划分</h3><p>区别就是索引的存储顺序和数据的存储顺序是否是关系的，有关就是聚簇索引，无关就是非聚簇索引。</p><ul><li>聚簇索引</li></ul><p>非叶子节点存储的是索引指针，叶子节点存储的是既有索引也有数据。InnoDB主键使用的是聚簇索引。</p><ul><li>非聚簇索引</li></ul><p>InnoDB 里的辅助索引也是非聚簇索引。</p><h3 id=125-其它分类>1.2.5 其它分类</h3><ul><li>唯一索引</li></ul><p>不允许索引具有想同值的索引。</p><ul><li>全文索引</li></ul><p>内置全文解析器，利用关键词查询。</p><p>下面我们将具体详解B+树和Hash索引</p><hr><h2 id=13-b树>1.3 B+树</h2><h3 id=131-数据结构>1.3.1 数据结构</h3><p>此数不再赘述数据结构，如需了解查看：<a href=https://fe1.fan/tags/data-structures-algorithms/>数据结构与算法</a></p><h3 id=131-具体使用原理>1.3.1 具体使用原理</h3><p>在InnoDB中，每个索引对应一棵B+树。</p><p>假设建表语句</p><pre><code class=language-sql>CREATE TABLE TEST (
+	id int PRIMARY KEY,
+	k int NOT NULL,
+	name varchar(20),
+	INDEX(k)
+) ENGINE = InnoDB;
+
+INSERT INTO TEST (id, k)
+VALUES  (100, 1),
+	(200, 2),
+	(300, 3),
+	(500, 5),
+	(600, 6);
+</code></pre><p>此时 id、k索引分别为两棵B+树</p><p>id:</p><pre><code class=language-mermaid>graph LR
+    key--&gt; index1
+    key--&gt; index2
+    index2(700)
+    index1(300)--&gt; r1
+    index1(300)--&gt; r3
+    r1(&quot;100|R1&quot;)---r2(&quot;200|R2&quot;)
+    r3(&quot;300|R3&quot;)---r4(&quot;500|R4&quot;)---r5(&quot;600|R5&quot;)
+</code></pre><p>k:</p><pre><code class=language-mermaid>graph LR
+    key--&gt; index1
+    key--&gt; index2
+    index2(7)
+    index1(3)--&gt; r1
+    index1(3)--&gt; r3
+    r1(&quot;1|100&quot;)---r2(&quot;2|200&quot;)
+    r3(&quot;3|300&quot;)---r4(&quot;5|500&quot;)---r5(&quot;6|600&quot;)
+</code></pre><p>根据字节点内容，索引类型分为主键索引和非主键索引。</p><p>主键索引保存的是整行的数据，在InnoDB中主键索引也被成为聚簇索引。</p><p>非主键索引的叶节点上存的是主键的值，在InnoDB中，非主键索引也被成为二级索引。</p><p>当查询语句索引走的是非主键索引时，搜索到内容后再根据主键内容到主键树搜索一次，这个过程被称为回表。</p><h2 id=14-hash索引>1.4 HASH索引</h2><h2 id=索引的存储>索引的存储</h2><h2 id=索引使用的过程>索引使用的过程</h2><h2 id=索引优化>索引优化</h2><p>当根据k查询时:</p><pre><code class=language-sql>SELECT * FROM TEST WHERE k BETWEEN 3 AND 5
+</code></pre><p>SQL的执行步骤如下：</p><ol><li>在 k 索引树上找到 k=3 的记录，取得 ID = 300;</li><li>再到 ID 索引树查到 ID=300 对应的 R3;</li><li>在 k 索引树取下一个值 k=5，取得 ID=500;</li><li>再回到 ID 索引树查到 ID=500 对应的 R4;</li><li>在 k 索引树取下一个值 k=6，不满足条件，循环结束。</li></ol><p>以上面的SQL为例，我们把SQL更改为：</p><pre><code class=language-sql>SELECT id FROM TEST WHERE k BETWEEN 3 AND 5
+</code></pre><p>当查询ID时，ID已经存在于树上，树可以直接提供查询结果，不需要回表，此时k已经覆盖了我们的查询需求，成为覆盖索引。</p><p><strong>需要注意的是，在引擎内部使用覆盖索引在索引 k 上其实读了三个记录，R3~R5(对应的 索引 k 上的记录项)，但是对于 MySQL 的 Server 层来说，它就是找引擎拿到了两条记 录，因此 MySQL 认为扫描行数是 2。</strong></p><p>假设表:</p><pre><code class=language-sql>CREATE TABLE `user` (
+	`id` int(11) NOT NULL,
+	`id_card` varchar(32) DEFAULT NULL,
+	`name` varchar(32) DEFAULT NULL,
+	`age` int(11) DEFAULT NULL,
+	`is_male` tinyint(1) DEFAULT NULL,
+	PRIMARY KEY (`id`),
+	KEY `id_card` (`id_card`),
+	KEY `name_age` (`name`, `age`)
+) ENGINE = InnoDB
+</code></pre><p>身份证作为唯一标识作为索引，假设当前情况要根据身份证查询姓名，有没有必要再建立(身份证号、姓名)索引？</p><p>如果现在有一个高频请求，要根据市民的身份证号查询他的姓名，这个联合索引就有意义
+了。它可以在这个高频请求上用到覆盖索引，不再需要回表查整行记录，减少语句的执行时间。</p><p>name_age 索引项如下：</p><pre><code class=language-mermaid>graph LR
+    id1(&quot;'李四', 20&quot;)----id2(&quot;'王五', 10&quot;)----id3(&quot;'张六', 30&quot;)----id4(&quot;'张三', 10&quot;)----id5(&quot;'张三', 10&quot;)----id6(&quot;'张三', 20&quot;)
+</code></pre><p>索引项是按照索引定义里面出现的字段顺序排序的。</p></div><div class=article-toc><h3>Contents</h3><nav id=TableOfContents><ul><li><a href=#11-索引>1.1 索引</a></li><li><a href=#12-索引类型>1.2 索引类型</a><ul><li><a href=#121-根据底层数据结构划分>1.2.1 根据底层数据结构划分</a></li><li><a href=#122-根据索引字段个数划分>1.2.2 根据索引字段个数划分</a></li><li><a href=#123-根据是否是在主键上建立的索引进行划分>1.2.3 根据是否是在主键上建立的索引进行划分</a></li><li><a href=#124-根据数据与索引的存储关联性划分>1.2.4 根据数据与索引的存储关联性划分</a></li><li><a href=#125-其它分类>1.2.5 其它分类</a></li></ul></li><li><a href=#13-b树>1.3 B+树</a><ul><li><a href=#131-数据结构>1.3.1 数据结构</a></li><li><a href=#131-具体使用原理>1.3.1 具体使用原理</a></li></ul></li><li><a href=#14-hash索引>1.4 HASH索引</a></li><li><a href=#索引的存储>索引的存储</a></li><li><a href=#索引使用的过程>索引使用的过程</a></li><li><a href=#索引优化>索引优化</a></li></ul></nav></div><footer class=article-footer><ul class=article-tag-list><li class=article-tag-list-item><a class=article-tag-list-link href=https://fe1.fan/tags/mysql>mysql</a></li></ul></footer><script src=https://cdn.jsdelivr.net/npm/mermaid@8.8.2/dist/mermaid.min.js integrity="sha256-KqisLh8jVMBRjpNkOhH5W9VWs+F6x6vQksLqxs7+x9A=" crossorigin=anonymous></script><script>Array.from(document.getElementsByClassName("language-mermaid")).forEach((el)=>{el.parentElement.outerHTML=`<div class="mermaid">${el.innerText}</div>`;});</script><style>.mermaid svg{display:block;margin:auto}</style></div><nav id=article-nav><a href=/posts/mysql/mysql-note-2/ id=article-nav-newer class=article-nav-link-wrap><div class=article-nav-title><span>&lt;</span>&nbsp;
+MySQL 笔记2：架构</div></a><a href=/posts/mysql/mysql-note-6/ id=article-nav-older class=article-nav-link-wrap><div class=article-nav-title>MySQL 笔记6：存储&nbsp;<span>></span></div></a></nav></article></section><footer id=footer><div class=outer><div id=footer-info class=inner>&copy; 2021 Fe1Fan<br>Powered by <a href=https://gohugo.io target=_blank>Hugo</a> with theme <a href=https://github.com/carsonip/hugo-theme-minos target=_blank>Minos</a></div></div><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/tomorrow-night.min.css integrity="sha256-2wL88NKUqvJi/ExflDzkzUumjUM73mcK2gBvBBeLvTk=" crossorigin=anonymous><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js integrity="sha256-KbfTjB0WZ8vvXngdpJGY3Yp3xKk+tttbqClO11anCIU=" crossorigin=anonymous></script><script>hljs.initHighlightingOnLoad();</script><script>document.getElementById('main-nav-toggle').addEventListener('click',function(){var header=document.getElementById('header');if(header.classList.contains('mobile-on')){header.classList.remove('mobile-on');}else{header.classList.add('mobile-on');}});</script></footer></div></body></html>
