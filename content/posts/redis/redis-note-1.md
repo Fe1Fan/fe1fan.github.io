@@ -5,7 +5,7 @@ tags: [redis]
 math: true
 ---
 <!--more--> 
-# 1基础数据结构
+# 1 基础数据结构
 
 - string
 - list
