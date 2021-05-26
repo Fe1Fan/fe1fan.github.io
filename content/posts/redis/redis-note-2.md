@@ -1,12 +1,12 @@
 ---
-title: "Redis 笔记2：架构"
+title: "Redis 笔记2：文件事件处理器"
 date: 2020-10-07T14:23:52+08:00
 tags: [redis]
 math: true
 ---
 <!--more-->
 
-## 1.0 架构
+## 1.0 文件事件处理器
 
 ![00015.jpg](https://i.loli.net/2021/05/26/8h1KHfMXNaAbsL9.jpg)
 
