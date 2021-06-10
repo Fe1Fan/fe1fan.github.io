@@ -9,8 +9,9 @@ mset k1 v1 k2 v2 k3 v3
 mget k1 k2 k3
 </code></pre><p>过期</p><pre><code class=language-shell>#过期
 expire k 5  #5秒后过期
-setex k 5 v
-setnx k 5 v #创建并过期 如果k不存在则创建，如果存在则不变。
+setex k 5 v  #创建并过期
+setnx k v # 如果k不存在则创建，如果存在则不变。
+set key value ex 5 nx # 如果k不存在则创建，如果存在则不变。 且设置过期时间。
 </code></pre><p>计数</p><pre><code class=language-shell>set k 10
 incr k
 &gt; 11
