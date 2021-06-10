@@ -35,8 +35,9 @@ mget k1 k2 k3
 ```shell
 #过期
 expire k 5  #5秒后过期
-setex k 5 v
-setnx k 5 v #创建并过期 如果k不存在则创建，如果存在则不变。
+setex k 5 v  #创建并过期
+setnx k v # 如果k不存在则创建，如果存在则不变。
+set key value ex 5 nx # 如果k不存在则创建，如果存在则不变。 且设置过期时间。
 ```
 
 计数
