@@ -53,7 +53,7 @@ draft: true
 > 可以看成对 Object `wait()、notify()、notifyAll()` 方法的扩展替代。
 
 #### Lock
-> 可以视为 `synchronized` 的增强版，提供了更灵活的功能。提供了现实锁等待、锁中断、锁尝试等功能。
+> 使用AQS实现， 可以视为 `synchronized`（CAS） 的增强版，提供了更灵活的功能。提供了现实锁等待、锁中断、锁尝试等功能。
 
 `lock()` 和 `lockInterruptibly()`
 
